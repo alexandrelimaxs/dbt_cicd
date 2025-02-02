@@ -1,0 +1,16 @@
+models:
+  - name: int_orders_per_customer
+    description: Tabela que mostra o total gasto por cliente.
+    columns:
+      - name: name
+        description: Nome do cliente.
+        data_type: string
+        data_tests:
+          - unique
+        quote: true
+      - name: total_value
+        description: Valor total gasto pelo cliente.
+        data_type: float64
+        data_tests:
+          - not_null
+        quote: true

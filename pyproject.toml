@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "dbt-env"
+version = "0.1.0"
+description = ""
+authors = ["alexandre <alexandrelimaxs@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.dev.dependencies]
+dbt-bigquery = "^1.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
