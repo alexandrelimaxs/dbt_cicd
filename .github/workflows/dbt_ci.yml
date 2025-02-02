@@ -38,10 +38,12 @@ jobs:
           poetry run dbt debug
 
       - name: 🧪 Executar Testes dbt
+        working-directory: ./dbt_project
         run: |
           poetry run dbt test
 
       - name: 🚀 Executar Modelos dbt (Apenas no Main)
         if: github.ref == 'refs/heads/main'
+        working-directory: ./dbt_project
         run: |
           poetry run dbt run
