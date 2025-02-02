@@ -54,8 +54,8 @@ jobs:
       # Se o workflow for executado na branch main, atualiza o manifest e faz upload para GCS:
       - name: Atualizar manifest.json (Produção)
         if: github.ref == 'refs/heads/main'
+        working-directory: ./dbt_project
         run: |
-          cd dbt_project
           poetry run dbt docs generate --target ci
           gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
 
@@ -70,19 +70,19 @@ jobs:
 
       # Executa os testes slim - apenas dos modelos modificados
       - name: Executar testes slim (somente modelos modificados)
+        working-directory: ./dbt_project
         run: |
-          cd dbt_project
           poetry run dbt test --target ci --state target --select state:modified+
 
       # Executa o run slim, se desejar (para aplicar mudanças em modelos modificados)
       - name: Executar dbt run slim (somente modelos modificados)
         if: github.ref == 'refs/heads/main'
+        working-directory: ./dbt_project
         run: |
-          cd dbt_project
           poetry run dbt run --target ci --state target --select state:modified+
 
       - name: Atualizar o manifest.json do projeto
+        working-directory: ./dbt_project
         run:
-          cd dbt_project
           poetry run dbt docs generate --target ci
           gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
