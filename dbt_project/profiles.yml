@@ -16,7 +16,7 @@ dbt_project:
       dataset: dbt
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: $HOME/gcp-key.json
+      keyfile: /home/runner/gcp-key.json
       location: US
       method: service-account
       priority: interactive
