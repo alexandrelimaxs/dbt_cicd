@@ -33,6 +33,13 @@ jobs:
           echo "$GOOGLE_CREDENTIALS" > /home/runner/gcp-key.json
           export GOOGLE_APPLICATION_CREDENTIALS="/home/runner/gcp-key.json"
 
+      - name: Configurar Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+          service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+          export_default_credentials: true
+
       # Executa dbt debug (opcional, para verificar a configuração)
       - name: Testar conexão com BigQuery
         run: |
