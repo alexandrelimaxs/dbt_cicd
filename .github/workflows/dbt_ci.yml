@@ -44,7 +44,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cd dbt_project
-          poetry run dbt docs generate
+          poetry run dbt docs generate --target ci
           gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
 
       # Em Pull Requests, baixa o manifest.json para comparação
