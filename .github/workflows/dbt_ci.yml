@@ -33,6 +33,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
 
       - name: ✅ Testar conexão com BigQuery
+        working-directory: ./dbt_project
         run: |
           poetry run dbt debug
 
