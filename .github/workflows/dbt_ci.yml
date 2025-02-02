@@ -1,10 +1,10 @@
-name: dbt CI/CD Pipeline
+name: dbt Slim CI Pipeline
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
+  push:
     branches:
       - main
 
@@ -13,37 +13,62 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚀 Checkout do código
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: 🔧 Instalar o Poetry
+      - name: Instalar o Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: 🛠️ Configurar Python e Instalar Dependências
+      - name: Instalar dependências
         run: |
           poetry install
 
-      - name: 🔑 Configurar Credenciais do BigQuery
+      # Configurar as credenciais do BigQuery e do GCS (use segredos do GitHub)
+      - name: Configurar Credenciais do BigQuery e GCS
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
           echo "$GOOGLE_CREDENTIALS" > /home/runner/gcp-key.json
           export GOOGLE_APPLICATION_CREDENTIALS="/home/runner/gcp-key.json"
 
-      - name: ✅ Testar conexão com BigQuery
-        working-directory: ./dbt_project
+      # Se o workflow for executado na branch main, atualiza o manifest e faz upload para GCS:
+      - name: Atualizar manifest.json (Produção)
+        if: github.ref == 'refs/heads/main'
         run: |
+          cd dbt_project
+          poetry run dbt docs generate
+          gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
+
+      # Em Pull Requests, baixa o manifest.json para comparação
+      - name: Baixar manifest.json do GCS
+        if: github.event_name == 'pull_request'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        run: |
+          mkdir -p dbt_project/target
+          gsutil cp gs://dbt_project_bucket_989/manifest.json dbt_project/target/manifest.json
+
+      # Executa dbt debug (opcional, para verificar a configuração)
+      - name: Testar conexão com BigQuery
+        run: |
+          cd dbt_project
           poetry run dbt debug --target ci
 
-      - name: 🧪 Executar Testes dbt
-        working-directory: ./dbt_project
+      # Executa os testes slim - apenas dos modelos modificados
+      - name: Executar testes slim (somente modelos modificados)
         run: |
-          poetry run dbt test --target ci
+          cd dbt_project
+          poetry run dbt test --target ci --state target --select state:modified+
 
-      - name: 🚀 Executar Modelos dbt (Apenas no Main)
+      # Executa o run slim, se desejar (para aplicar mudanças em modelos modificados)
+      - name: Executar dbt run slim (somente modelos modificados)
         if: github.ref == 'refs/heads/main'
-        working-directory: ./dbt_project
         run: |
-          poetry run dbt run --target ci
+          cd dbt_project
+          poetry run dbt run --target ci --state target --select state:modified+
+
+      - name: Atualizar o manifest.json do projeto
+        run:
+          gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
