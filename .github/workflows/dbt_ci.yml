@@ -33,6 +33,12 @@ jobs:
           echo "$GOOGLE_CREDENTIALS" > /home/runner/gcp-key.json
           export GOOGLE_APPLICATION_CREDENTIALS="/home/runner/gcp-key.json"
 
+      # Executa dbt debug (opcional, para verificar a configuração)
+      - name: Testar conexão com BigQuery
+        run: |
+          cd dbt_project
+          poetry run dbt debug --target ci
+
       # Se o workflow for executado na branch main, atualiza o manifest e faz upload para GCS:
       - name: Atualizar manifest.json (Produção)
         if: github.ref == 'refs/heads/main'
@@ -49,12 +55,6 @@ jobs:
         run: |
           mkdir -p dbt_project/target
           gsutil cp gs://dbt_project_bucket_989/manifest.json dbt_project/target/manifest.json
-
-      # Executa dbt debug (opcional, para verificar a configuração)
-      - name: Testar conexão com BigQuery
-        run: |
-          cd dbt_project
-          poetry run dbt debug --target ci
 
       # Executa os testes slim - apenas dos modelos modificados
       - name: Executar testes slim (somente modelos modificados)
