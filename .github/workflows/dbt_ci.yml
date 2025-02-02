@@ -34,7 +34,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="/home/runner/gcp-key.json"
 
       - name: Autenticar no Google Cloud
-        uses: google-github-actions/auth
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
           
