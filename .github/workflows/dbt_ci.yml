@@ -1,0 +1,46 @@
+name: dbt CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🔧 Instalar o Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: 🛠️ Configurar Python e Instalar Dependências
+        run: |
+          poetry install
+
+      - name: 🔑 Configurar Credenciais do BigQuery
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > $HOME/gcp-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
+
+      - name: ✅ Testar conexão com BigQuery
+        run: |
+          poetry run dbt debug
+
+      - name: 🧪 Executar Testes dbt
+        run: |
+          poetry run dbt test
+
+      - name: 🚀 Executar Modelos dbt (Apenas no Main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          poetry run dbt run
