@@ -29,8 +29,8 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
-          echo "$GOOGLE_CREDENTIALS" > /home/runner/gcp-key.json
-          export GOOGLE_APPLICATION_CREDENTIALS="/home/runner/gcp-key.json"
+          echo "$GOOGLE_CREDENTIALS" > $HOME/gcp-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
 
       - name: ✅ Testar conexão com BigQuery
         working-directory: ./dbt_project
