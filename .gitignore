@@ -1,2 +1,7 @@
 dbt_project/secrets
 .user.yml
+.vscode/
+.dbt_env/
+logs/
+tests/
+poetry.lock
