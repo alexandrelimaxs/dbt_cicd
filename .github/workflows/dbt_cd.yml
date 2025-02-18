@@ -44,9 +44,9 @@ jobs:
 
 
       - name: Testar conexão com BigQuery
+        working-directory: ./dbt_project
         run: |
-          cd dbt_project
-          poetry run dbt debug --target ci
+          poetry run dbt debug --target prod
 
 
       - name: Fazer deploy dos modelos em produção
