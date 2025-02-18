@@ -31,6 +31,7 @@ jobs:
       - name: Importar Credenciais do BigQuery e Google Cloud Storage
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" > /home/runner/gcp-key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/home/runner/gcp-key.json" >> $GITHUB_ENV
 
 
       - name: Autenticar no Google Cloud
