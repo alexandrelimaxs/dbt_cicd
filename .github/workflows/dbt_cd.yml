@@ -1,12 +1,9 @@
-name: dbt-core Continuous Integration
+name: dbt-core Continuous Delivery
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types:
-      - opened
-      - synchronize
 
 jobs:
   dbt:
@@ -37,7 +34,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
-          
+
 
       - name: Configurar Google Cloud Storage
         uses: google-github-actions/setup-gcloud@v1
@@ -46,29 +43,20 @@ jobs:
           install_components: 'gsutil'
 
 
-      - name: Testar conexão do dbt com o BigQuery
-        working-directory: ./dbt_project
+      - name: Testar conexão com BigQuery
         run: |
+          cd dbt_project
           poetry run dbt debug --target ci
 
 
-      - name: Baixar manifest.json do Google Cloud Storage
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: |
-          mkdir -p dbt_project/target
-          gsutil cp gs://dbt_project_bucket_989/manifest.json dbt_project/target/manifest.json
-
-
-      - name: Executar dbt run slim
+      - name: Fazer deploy dos modelos em produção
         working-directory: ./dbt_project
         run: |
-          poetry run dbt run --target ci --state target --select state:modified+ || echo "Nenhuma modificação detectada"
+          poetry run dbt build --target prod --state target --select state:modified+ || echo "Nenhuma modificação detectada"
 
 
-      - name: Executar testes slim
+      - name: Atualizar o manifest.json do projeto
         working-directory: ./dbt_project
         run: |
-          poetry run dbt test --target ci --state target --select state:modified+ || echo "Nenhuma modificação detectada"
-
-
+          poetry run dbt docs generate --target prod
+          gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
