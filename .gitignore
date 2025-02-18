@@ -1,1 +1,2 @@
 dbt_project/secrets
+.user.yml
