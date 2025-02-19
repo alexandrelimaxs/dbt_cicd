@@ -9,6 +9,9 @@ jobs:
   dbt:
     runs-on: ubuntu-latest
 
+    env:
+      GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -62,4 +65,4 @@ jobs:
         working-directory: ./dbt_project
         run: |
           poetry run dbt docs generate --target prod
-          gsutil cp target/manifest.json gs://dbt_project_bucket_989/manifest.json
+          gsutil cp target/manifest.json gs://${{ env.GCS_BUCKET }}/manifest.json

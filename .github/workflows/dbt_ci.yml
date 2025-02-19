@@ -12,6 +12,9 @@ jobs:
   dbt:
     runs-on: ubuntu-latest
 
+    env:
+      GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -60,7 +63,7 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
           mkdir -p dbt_project/target
-          gsutil cp gs://dbt_project_bucket_989/manifest.json dbt_project/target/manifest.json
+          gsutil cp gs://${{ env.GCS_BUCKET }}/manifest.json dbt_project/target/manifest.json
 
 
       - name: Executar dbt run slim
