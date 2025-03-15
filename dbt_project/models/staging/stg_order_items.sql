@@ -4,7 +4,7 @@ SELECT
   product_id,
   quantity,
   list_price,
-  "USD" as currency,
+  "BRL" as currency,
   discount
 FROM
   `estudos-414618.raw_data.order_items`
