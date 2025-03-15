@@ -1,0 +1,14 @@
+models:
+  - name: stg_order_items
+    description: Tabela que contém os itens dos pedidos.
+    columns:
+      - name: order_id
+      - name: item_id
+      - name: product_id
+      - name: quantity
+      - name: list_price
+      - name: currency
+        tests:
+          - accepted_values:
+              values: ['USD']
+      - name: discount
