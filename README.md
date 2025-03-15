@@ -203,7 +203,7 @@ Esse erro será indicado na página do Pull Request, onde será possível realiz
 
 Esse é o último passo do fluxo, e aqui a modificação feita no pull request já deve ter passado nos testes do CI e está prestes a ser aplicada no ambiente de produção.
 
-Neste fluxo criaremos o mesmo ambiente acima: com o ambiente testado e com as duas fotografias.
+Neste fluxo criaremos o mesmo cenário acima: com o ambiente testado e com as duas fotografias.
 
 ### Aplicação das mudanças em produção
 
