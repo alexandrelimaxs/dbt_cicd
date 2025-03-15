@@ -5,3 +5,4 @@ dbt_project/secrets
 logs/
 tests/
 poetry.lock
+__pycache__/
