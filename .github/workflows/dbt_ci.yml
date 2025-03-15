@@ -58,23 +58,27 @@ jobs:
           poetry run dbt debug --target ci
 
 
-      - name: Baixar manifest.json do Google Cloud Storage
+      - name: Compilar modelos dbt
+        working-directory: ./dbt_project
+        run: |
+          poetry run dbt compile --target ci
+
+
+      - name: Baixar manifest.json de prod do Google Cloud Storage
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
           mkdir -p dbt_project/target
-          gsutil cp gs://${{ env.GCS_BUCKET }}/manifest.json dbt_project/target/manifest.json
+          gsutil cp gs://${{ env.GCS_BUCKET }}/manifest.json dbt_project/target_prod/manifest.json
 
 
-      - name: Executar dbt run slim
+      - name: Listar modelos modificados
         working-directory: ./dbt_project
         run: |
-          poetry run dbt run --target ci --state target --select state:modified+ || echo "Nenhuma modificação detectada"
+          poetry run dbt ls --state target_prod --select state:modified+
 
 
-      - name: Executar testes slim
+      - name: Executar dbt build slim
         working-directory: ./dbt_project
         run: |
-          poetry run dbt test --target ci --state target --select state:modified+ || echo "Nenhuma modificação detectada"
-
-
+          poetry run dbt build --target ci --state target_prod --select state:modified+ || echo "Nenhuma modificação detectada"

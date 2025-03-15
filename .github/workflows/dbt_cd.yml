@@ -55,14 +55,27 @@ jobs:
           poetry run dbt debug --target prod
 
 
+      - name: Baixar manifest.json de prod do Google Cloud Storage
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          mkdir -p dbt_project/target
+          gsutil cp gs://${{ env.GCS_BUCKET }}/manifest.json dbt_project/target_prod/manifest.json
+
+
+      - name: Compilar modelos dbt
+        working-directory: ./dbt_project
+        run: |
+          poetry run dbt compile --target prod
+
+
       - name: Fazer deploy dos modelos em produção
         working-directory: ./dbt_project
         run: |
-          poetry run dbt build --target prod --state target --select state:modified+ || echo "Nenhuma modificação detectada"
+          poetry run dbt build --target prod --state target_prod --select state:modified+ || echo "Nenhuma modificação detectada"
 
 
       - name: Atualizar o manifest.json do projeto
         working-directory: ./dbt_project
         run: |
-          poetry run dbt docs generate --target prod
           gsutil cp target/manifest.json gs://${{ env.GCS_BUCKET }}/manifest.json
