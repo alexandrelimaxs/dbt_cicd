@@ -72,7 +72,7 @@ jobs:
       - name: Fazer deploy dos modelos em produção
         working-directory: ./dbt_project
         run: |
-          poetry run dbt build --target prod --state target_prod --select state:modified+ || echo "Nenhuma modificação detectada"
+          poetry run dbt build --target prod --state target_prod --select state:modified+
 
 
       - name: Atualizar o manifest.json do projeto
