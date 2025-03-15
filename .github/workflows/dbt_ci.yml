@@ -81,4 +81,4 @@ jobs:
       - name: Executar dbt build slim
         working-directory: ./dbt_project
         run: |
-          poetry run dbt build --target ci --defer --state target_prod --select state:modified+ || echo "Nenhuma modificação detectada"
+          poetry run dbt build --target ci --defer --state target_prod --select state:modified+
